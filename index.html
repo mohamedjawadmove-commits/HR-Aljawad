@@ -1,731 +1,732 @@
 <!DOCTYPE html>
-
 <html lang="en" dir="ltr">
-
 <head>
-
   <meta charset="UTF-8">
-
-  <title>Aljawad HR & Operations Co.</title>
-
+  <title>Aljawad HR & Employee Self-Service Platform</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <style>
-
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
     body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-
+    .calendar-grid { display: grid; grid-template-cols: repeat(7, 1fr); gap: 4px; }
   </style>
-
 </head>
+<body class="bg-slate-50 min-h-screen flex flex-col md:flex-row overflow-hidden" id="main-body-container">
 
-<body class="flex h-screen overflow-hidden">
+  <div id="app-gateway" class="fixed inset-0 bg-slate-900 z-[9999] flex flex-col items-center justify-center p-4">
+    <div class="text-center mb-8">
+      <i class="fa-solid fa-truck-flatbed text-amber-500 text-5xl mb-3"></i>
+      <h1 class="text-3xl font-extrabold text-white tracking-wide">Aljawad Logistics Cloud</h1>
+      <p class="text-slate-400 text-sm mt-1">Select portal connection node to initialize database</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-xl">
+      <button onclick="enterPortal('hr')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 p-6 rounded-2xl text-left transition-all shadow-xl group">
+        <i class="fa-solid fa-shield-halved text-amber-500 text-3xl mb-4 group-hover:scale-110 transition-transform"></i>
+        <h3 class="text-lg font-bold text-white">HR Operations Management</h3>
+        <p class="text-slate-400 text-xs mt-1">Access master payroll, logistics analytics, labor ledger, and database controls.</p>
+      </button>
+      <button onclick="enterPortal('employee')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 p-6 rounded-2xl text-left transition-all shadow-xl group">
+        <i class="fa-solid fa-user-gear text-emerald-400 text-3xl mb-4 group-hover:scale-110 transition-transform"></i>
+        <h3 class="text-lg font-bold text-white">Employee Self-Service Portal</h3>
+        <p class="text-slate-400 text-xs mt-1">Clock-in/out via GPS, track overtime cycles, view dynamic statement, and attendance calendar.</p>
+      </button>
+    </div>
+    <p class="text-slate-600 text-xs mt-12">System Architecture Engine v6.0-Hub • Powered by Firebase Cloud Node</p>
+  </div>
 
-
-
-  <div class="w-64 bg-slate-900 text-white flex flex-col justify-between p-4 shadow-xl">
-
-    <div>
-
-      <div class="flex items-center space-x-3 mb-8 mt-2 px-2">
-
-        <i class="fa-solid fa-truck-flatbed text-amber-500 text-2xl"></i>
-
-        <span class="text-xl font-bold tracking-wide">Aljawad Co.</span>
-
+  <div id="hr-master-layout" class="hidden w-full flex h-screen overflow-hidden">
+    <div class="w-64 bg-slate-900 text-white flex flex-col justify-between p-4 shadow-xl shrink-0">
+      <div>
+        <div class="flex items-center space-x-3 mb-8 mt-2 px-2">
+          <i class="fa-solid fa-truck-flatbed text-amber-500 text-2xl"></i>
+          <span class="text-xl font-bold tracking-wide">Aljawad HR</span>
+        </div>
+        <nav class="space-y-1">
+          <button onclick="switchHRTab('reports', this)" class="hr-tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-amber-500 text-slate-950 font-semibold transition-all">
+            <i class="fa-solid fa-chart-pie w-5"></i><span>Dashboard & Reports</span>
+          </button>
+          <button onclick="switchHRTab('employees', this)" class="hr-tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all">
+            <i class="fa-solid fa-users w-5"></i><span>HR Data Logs</span>
+          </button>
+          <button onclick="switchHRTab('laborRecords', this)" class="hr-tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all">
+            <i class="fa-solid fa-triangle-exclamation w-5"></i><span>Labor Ledger</span>
+          </button>
+          <button onclick="switchHRTab('requests', this)" class="hr-tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all">
+            <i class="fa-solid fa-envelope-open-text w-5"></i><span>Requests Node</span>
+          </button>
+          <button onclick="switchHRTab('attendance', this)" class="hr-tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all">
+            <i class="fa-solid fa-user-clock w-5"></i><span>Master Attendance</span>
+          </button>
+        </nav>
       </div>
-
-      <nav class="space-y-1">
-
-        <button onclick="switchTab('reports', this)" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-amber-500 text-slate-950 font-semibold transition-all">
-
-          <i class="fa-solid fa-chart-pie w-5"></i><span>Dashboard & Reports</span>
-
-        </button>
-
-        <button onclick="switchTab('employees', this)" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all">
-
-          <i class="fa-solid fa-users w-5"></i><span>HR Data</span>
-
-        </button>
-
-        <button onclick="switchTab('laborRecords', this)" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all">
-
-          <i class="fa-solid fa-triangle-exclamation w-5"></i><span>Labor Record</span>
-
-        </button>
-
-        <button onclick="switchTab('requests', this)" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all">
-
-          <i class="fa-solid fa-envelope-open-text w-5"></i><span>Request Data</span>
-
-        </button>
-
-        <button onclick="switchTab('attendance', this)" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all">
-
-          <i class="fa-solid fa-user-clock w-5"></i><span>Attendance Log</span>
-
-        </button>
-
-        <button onclick="switchTab('permissions', this)" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all">
-
-          <i class="fa-solid fa-shield-halved w-5"></i><span>System Security</span>
-
-        </button>
-
-      </nav>
-
+      <button onclick="logoutToGateway()" class="w-full text-left text-xs text-slate-400 hover:text-white border-t border-slate-800 pt-4 flex items-center space-x-2">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i><span>Exit to Gateway</span>
+      </button>
     </div>
 
-    <div class="text-xs text-slate-500 text-center border-t border-slate-800 pt-4">HR Engine v5.5-Hub © 2026</div>
-
-  </div>
-
-
-
-  <div class="flex-1 flex flex-col overflow-hidden">
-
-    <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-8 shadow-sm">
-
-      <h1 id="page-title" class="text-xl font-bold text-gray-800">System Analytics Dashboard</h1>
-
-      <div class="flex items-center space-x-4">
-
-        <div id="search-container" class="relative hidden">
-
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-xs"></i>
-
-          <input type="text" id="search-input" onkeyup="filterCurrentTable()" placeholder="Search active logs..." class="border border-gray-200 rounded-lg pl-9 pr-4 py-1.5 text-sm bg-slate-50 focus:bg-white w-64">
-
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-8 shadow-sm">
+        <h1 id="hr-page-title" class="text-xl font-bold text-gray-800">System Analytics Dashboard</h1>
+        <div class="flex items-center space-x-4">
+          <div id="year-filter-container" class="hidden">
+            <select id="year-select-box" onchange="filterRequestsByYear()" class="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-slate-50 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <option value="2026" selected>Year: 2026 (Active)</option>
+              <option value="2025">Year: 2025 (Archive)</option>
+              <option value="2024">Year: 2024 (Archive)</option>
+            </select>
+          </div>
+          <div id="hr-search-container" class="relative hidden">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-xs"></i>
+            <input type="text" id="hr-search-input" onkeyup="filterHRTable()" placeholder="Search active records..." class="border border-gray-200 rounded-lg pl-9 pr-4 py-1.5 text-sm bg-slate-50 focus:bg-white w-64">
+          </div>
+          <button id="hr-add-btn" onclick="openHRAddModal()" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 transition-all hidden">
+            <i class="fa-solid fa-plus"></i><span>Add Record</span>
+          </button>
         </div>
-
-        <button id="add-btn" onclick="openAddModal()" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 transition-all hidden">
-
-          <i class="fa-solid fa-plus"></i><span>Add Entry</span>
-
-        </button>
-
-      </div>
-
-    </header>
-
-
-
-    <main class="flex-1 overflow-x-auto overflow-y-auto p-8">
-
-      <div id="loader" class="flex flex-col items-center justify-center py-20">
-
-        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-amber-500 mb-3"></i>
-
-        <p class="text-gray-500 text-sm">Streaming Firebase dataset via GitHub Cloud Node...</p>
-
-      </div>
-
-
-
-      <div id="table-container" class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden hidden">
-
-        <table id="data-table" class="w-full text-left border-collapse">
-
-          <thead id="table-head" class="bg-slate-50 border-b border-gray-200 text-slate-700 font-semibold text-sm"></thead>
-
-          <tbody id="table-body" class="text-gray-600 text-sm divide-y divide-gray-100"></tbody>
-
-        </table>
-
-      </div>
-
-
-
-      <div id="dashboard-view" class="hidden space-y-6">
-
-        <div class="flex border-b border-gray-200 space-x-2 bg-white p-2 rounded-xl border">
-
-          <button onclick="renderReportSection('summary')" class="report-tab px-4 py-2 rounded-lg text-sm font-bold bg-amber-500 text-slate-950">Overview Dashboard</button>
-
-          <button onclick="renderReportSection('iqama')" class="report-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">Iqama Expiry Status</button>
-
-          <button onclick="renderReportSection('ages')" class="report-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">Age Demographics</button>
-
-          <button onclick="renderReportSection('nationalities')" class="report-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">Nationalities (%)</button>
-
-          <button onclick="renderReportSection('vacations')" class="report-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">Vacations Analytics</button>
-
-          <button onclick="renderReportSection('salaries')" class="report-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">Salaries & Finance</button>
-
-        </div>
-
-        <div id="report-content-view" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
-
-      </div>
-
-    </main>
-
-  </div>
-
-
-
-  <div id="crud-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-
-    <div class="bg-white rounded-xl shadow-2xl border border-gray-100 w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh]">
-
-      <header class="bg-slate-50 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-
-        <h3 id="modal-title" class="font-bold text-gray-800 text-lg">Manage Entry</h3>
-
-        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
-
       </header>
 
-      <form id="modal-form" onsubmit="saveRecord(event)" class="p-6 space-y-4 overflow-y-auto flex-1">
-
-        <input type="hidden" id="form-key">
-
-        <div id="form-fields" class="grid grid-cols-1 gap-4"></div>
-
-        <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
-
-          <button type="button" onclick="closeModal()" class="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">Cancel</button>
-
-          <button type="submit" id="save-btn" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-sm">Save Record</button>
-
+      <main class="flex-1 overflow-auto p-8">
+        <div id="hr-loader" class="flex flex-col items-center justify-center py-20">
+          <i class="fa-solid fa-circle-notch fa-spin text-4xl text-amber-500 mb-3"></i>
+          <p class="text-gray-500 text-sm">Streaming dataset from Firebase Cloud Node...</p>
         </div>
 
-      </form>
+        <div id="hr-table-container" class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden hidden">
+          <table class="w-full text-left border-collapse">
+            <thead id="hr-table-head" class="bg-slate-50 border-b border-gray-200 text-slate-700 font-semibold text-sm"></thead>
+            <tbody id="hr-table-body" class="text-gray-600 text-sm divide-y divide-gray-100"></tbody>
+          </table>
+        </div>
 
+        <div id="hr-dashboard-view" class="hidden space-y-6">
+          <div class="flex border-b border-gray-200 space-x-2 bg-white p-2 rounded-xl border scrollbar-none overflow-x-auto">
+            <button onclick="renderHRReport('summary', this)" class="hr-report-tab px-4 py-2 rounded-lg text-sm font-bold bg-amber-500 text-slate-950">Overview Dashboard</button>
+            <button onclick="renderHRReport('statement', this)" class="hr-report-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">كشف حساب موظف 🧾</button>
+            <button onclick="renderHRReport('iqama', this)" class="hr-report-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">Iqama Expiry Engine</button>
+            <button onclick="renderHRReport('vacations', this)" class="hr-report-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">Vacations Metrics</button>
+            <button onclick="renderHRReport('salaries', this)" class="hr-report-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">Salaries Matrix</button>
+          </div>
+          <div id="hr-report-content-view" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+        </div>
+      </main>
     </div>
-
   </div>
 
 
+  <div id="employee-portal-layout" class="hidden w-full flex flex-col h-screen overflow-hidden bg-slate-900 text-slate-100">
+    
+    <div id="emp-login-pane" class="flex-1 flex items-center justify-center p-4">
+      <div class="bg-slate-800 border border-slate-700 p-8 rounded-2xl w-full max-w-md shadow-2xl">
+        <div class="text-center mb-6">
+          <i class="fa-solid fa-user-lock text-emerald-400 text-4xl mb-2"></i>
+          <h2 class="text-xl font-bold text-white">Employee Secure Check-In</h2>
+          <p class="text-slate-400 text-xs mt-1">Please insert your National/Iqama ID and Password</p>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 font-bold mb-1">National ID / Iqama Number</label>
+            <input type="text" id="emp-login-iqama" placeholder="e.g. 2394857463" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 font-bold mb-1">Password</label>
+            <input type="password" id="emp-login-pass" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-emerald-500">
+          </div>
+          <button onclick="processEmployeeAuth()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 rounded-xl shadow-lg transition-all text-sm flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-key"></i><span>Authenticate & Connect</span>
+          </button>
+          <button onclick="logoutToGateway()" class="w-full text-slate-500 hover:text-slate-400 text-xs text-center pt-2">Return to Gateway</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="emp-workspace-pane" class="hidden flex-1 flex flex-col overflow-hidden">
+      <header class="bg-slate-950 border-b border-slate-800 h-16 flex items-center justify-between px-6 shrink-0">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-slate-950 text-sm" id="emp-avatar-badge">M</div>
+          <div>
+            <h4 class="text-sm font-bold text-white" id="emp-profile-name">Loading...</h4>
+            <p class="text-[10px] text-slate-400 font-mono" id="emp-profile-id">ID: -</p>
+          </div>
+        </div>
+        <button onclick="logoutEmployee()" class="text-slate-400 hover:text-rose-400 text-xs flex items-center space-x-1 border border-slate-800 px-3 py-1.5 rounded-lg bg-slate-900">
+          <i class="fa-solid fa-power-off"></i><span>Logout</span>
+        </button>
+      </header>
+
+      <main class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+              <h4 class="font-bold text-sm text-slate-200 flex items-center space-x-2"><i class="fa-solid fa-user-clock text-emerald-400"></i><span>Standard Working Shift</span></h4>
+              <span class="text-[11px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-mono" id="standard-live-status">Ready</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <button id="btn-checkin" onclick="executeClockAction('checkin')" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 p-4 rounded-xl font-bold text-center transition-all flex flex-col items-center justify-center"><i class="fa-solid fa-right-to-bracket text-lg mb-1"></i><span class="text-xs">Check In (حضور)</span></button>
+              <button id="btn-checkout" onclick="executeClockAction('checkout')" class="bg-slate-700 hover:bg-slate-600 text-white p-4 rounded-xl font-bold text-center transition-all flex flex-col items-center justify-center"><i class="fa-solid fa-right-from-bracket text-lg mb-1"></i><span class="text-xs">Check Out (انصراف)</span></button>
+            </div>
+            <p id="standard-calc-msg" class="text-xs font-mono text-slate-400 text-center bg-slate-900/50 p-2 rounded-lg">-</p>
+          </div>
+
+          <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+              <h4 class="font-bold text-sm text-slate-200 flex items-center space-x-2"><i class="fa-solid fa-bolt text-amber-400"></i><span>Overtime Cycle Tracking</span></h4>
+              <span class="text-[11px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full font-mono" id="ot-live-status">Inactive</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <button id="btn-ot-start" onclick="executeClockAction('ot_start')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 p-4 rounded-xl font-bold text-center transition-all flex flex-col items-center justify-center"><i class="fa-solid fa-play text-xs mb-1"></i><span class="text-xs">Start Overtime</span></button>
+              <button id="btn-ot-end" onclick="executeClockAction('ot_end')" class="bg-slate-700 hover:bg-slate-600 text-white p-4 rounded-xl font-bold text-center transition-all flex flex-col items-center justify-center"><i class="fa-solid fa-stop text-xs mb-1"></i><span class="text-xs">End Overtime</span></button>
+            </div>
+            <p id="ot-calc-msg" class="text-xs font-mono text-slate-400 text-center bg-slate-900/50 p-2 rounded-lg">-</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg">
+          <div class="flex justify-between items-center mb-4">
+            <h4 class="font-bold text-sm text-slate-200 flex items-center space-x-2"><i class="fa-solid fa-calendar-days text-indigo-400"></i><span>Attendance Calendar - Current Month</span></h4>
+            <div class="flex items-center space-x-3 text-[10px]">
+              <span class="flex items-center space-x-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span><span class="text-slate-400">حضر</span></span>
+              <span class="flex items-center space-x-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span><span class="text-slate-400">غائب</span></span>
+              <span class="flex items-center space-x-1"><span class="w-2 h-2 rounded-full bg-amber-400"></span><span class="text-slate-400">جمعة</span></span>
+            </div>
+          </div>
+          <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold text-slate-500 border-b border-slate-700 pb-1 mb-2">
+            <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+          </div>
+          <div id="emp-calendar-grid" class="calendar-grid"></div>
+        </div>
+
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg space-y-4">
+          <h4 class="font-bold text-sm text-slate-200 flex items-center space-x-2"><i class="fa-solid fa-file-invoice-dollar text-teal-400"></i><span>كشف حساب الحركات والخصومات المالي</span></h4>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="border-b border-slate-700 text-slate-400 font-bold bg-slate-950/40">
+                  <th class="p-3">التاريخ</th>
+                  <th class="p-3">النوع</th>
+                  <th class="p-3">المبلغ المستقطع</th>
+                  <th class="p-3">الرصيد المتبقي</th>
+                  <th class="p-3">الملاحظات</th>
+                </tr>
+              </thead>
+              <tbody id="emp-statement-rows" class="divide-y divide-slate-700/50 text-slate-300 font-mono">
+                <tr><td colspan="5" class="p-3 text-center text-slate-500">No transactions recorded.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+
+  <div id="hr-crud-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center hidden">
+    <div class="bg-white rounded-xl shadow-2xl border border-gray-100 w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh]">
+      <header class="bg-slate-50 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+        <h3 id="hr-modal-title" class="font-bold text-gray-800 text-lg">Manage Entry</h3>
+        <button onclick="closeHRModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </header>
+      <form id="hr-modal-form" onsubmit="saveHRRecord(event)" class="p-6 space-y-4 overflow-y-auto flex-1">
+        <input type="hidden" id="hr-form-key">
+        <div id="hr-form-fields" class="grid grid-cols-1 gap-4"></div>
+        <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+          <button type="button" onclick="closeHRModal()" class="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" id="hr-save-btn" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-sm">Save Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script>
-
     // تهيئة مسارات وقفل قاعدة البيانات الآمنة مباشرة من المتصفح بدون وسيط
-
     const DB_URL = "https://aljawad-hr-system-default-rtdb.asia-southeast1.firebasedatabase.app/";
-
     const DB_SECRET = "5ZmEfIPJ7TSSch1VWN0wa2CbKmZ0IMcV7FcfEMEo";
-
-    // رابط سيرفر جوجل لإرسال الإيميلات الفورية عند الإضافة من قبل الموظف
-
+    // رابط سيرفر جوجل لإرسال الإيميلات الفورية عند الإضافة أو لتسجيل الحضور والإنصراف والأوفرتايم
     const GAS_REST_API = "https://script.google.com/macros/s/AKfycbz_G1X4qRlyr6R5vS-2_f8qXn2_Your_Deployment_ID/exec"; 
 
-
-
-    let currentTab = 'reports';
-
     let localDatabaseCache = { employees: {}, laborRecords: {}, requests: {}, attendance: {}, permissions: {} };
+    let activeHRTab = 'reports';
+    let currentSessionEmployee = null; // الموظف المسجل دخوله حالياً في البوابة المستقلة
 
-
-
-    // الـ Lists الجاهزة للـ Listboxes (تأمين إدخال البيانات للـ HR)
-
+    // الـ Lists الجاهزة للـ Listboxes (تأمين إدخال البيانات للـ HR تلبية لطلبك السابق)
     const listsOptions = {
-
       nationality: ['Saudi', 'Egyptian', 'Indian', 'Pakistani', 'Bangladeshi', 'Sudanese', 'Yemeni'],
-
       jobTitle: ['Heavy Truck Driver', 'Dyna Driver', 'Operations Officer', 'Accountant', 'HR Specialist', 'Warehouse Worker', 'Operations Manager'],
-
       status: ['Present', 'Absent', 'On Vacation', 'Business Mission'],
-
       requestType: ['Vacation Leave', 'Salary Advance (سلفة)', 'Iqama Renewal', 'Resignation', 'Other Request']
-
     };
-
-
 
     const schemas = {
-
-      employees: { employeeNo: 'E-', fullName: '', nationalId: '', jobTitle: '', totalSalary: '', iqamaExpDate: '', nationality: '', phoneNumber: '', birthDate: '', lastVacationReturnDate: '' },
-
-      laborRecords: { sr: '', date: '', employeeName: '', recordType: '', actionTaken: '', amount: '', status: '', notes:'' },
-
+      employees: { employeeNo: 'E-', fullName: '', nationalId: '', jobTitle: '', totalSalary: '', iqamaExpDate: '', nationality: '', phoneNumber: '', birthDate: '', lastVacationReturnDate: '', portalPassword: '123' },
+      laborRecords: { date: '', employeeName: '', recordType: 'Penalty/Other', actionTaken: 'Deduction', amount: '', notes:'' },
       requests: { timestamp: '', email: '', fullName: '', requestType: '', requestDetails: '', status: 'Pending' },
-
-      attendance: { date: '', employeeNo: '', name: '', checkIn: '', checkOut: '', status: 'Present' },
-
-      permissions: { userEmail: '', role: 'Viewer', nodeAccess: 'All' }
-
+      attendance: { date: '', employeeNo: '', name: '', checkIn: '', checkOut: '', hoursWorked: '', otStart: '', otEnd: '', otHours: '', status: 'Present', locationGPS: '' }
     };
 
+    window.onload = function() { preloadDataFromFirebase(); };
 
-
-    window.onload = function() { preloadDatabaseFromHub(); };
-
-
-
-    // سحب البيانات الفوري والمباشر من السيرفر بسرعة فائقة
-
-    function preloadDatabaseFromHub() {
-
+    function preloadDataFromFirebase() {
       fetch(`${DB_URL}.json?auth=${DB_SECRET}`)
-
         .then(res => res.json())
-
         .then(db => {
-
-          localDatabaseCache.employees = db.employees || {};
-
-          localDatabaseCache.laborRecords = db.laborRecords || {};
-
-          localDatabaseCache.requests = db.requests || {};
-
-          localDatabaseCache.attendance = db.attendance || {};
-
-          localDatabaseCache.permissions = db.permissions || {};
-
-          document.getElementById('loader').classList.add('hidden');
-
-          switchTab('reports', document.querySelector('.tab-btn'));
-
-        }).catch(err => alert("Error communicating with Cloud Realtime Engine."));
-
+          if (db) {
+            localDatabaseCache.employees = db.employees || {};
+            localDatabaseCache.laborRecords = db.laborRecords || {};
+            localDatabaseCache.requests = db.requests || {};
+            localDatabaseCache.attendance = db.attendance || {};
+          }
+          document.getElementById('hr-loader').classList.add('hidden');
+          // تهيئة لوحة تحكم الـ HR بشكل افتراضي
+          renderHRTable(activeHRTab, localDatabaseCache[activeHRTab]);
+        }).catch(err => console.error("Error connecting with Realtime Node.", err));
     }
 
+    function enterPortal(type) {
+      document.getElementById('app-gateway').classList.add('hidden');
+      if (type === 'hr') {
+        document.getElementById('hr-master-layout').classList.remove('hidden');
+        switchHRTab('reports', document.querySelector('.hr-tab-btn'));
+      } else {
+        document.getElementById('employee-portal-layout').classList.remove('hidden');
+      }
+    }
 
+    function logoutToGateway() {
+      document.getElementById('hr-master-layout').classList.add('hidden');
+      document.getElementById('employee-portal-layout').classList.add('hidden');
+      document.getElementById('app-gateway').classList.remove('hidden');
+    }
 
-    function switchTab(tabName, btn) {
-
-      document.querySelectorAll('.tab-btn').forEach(b => {
-
+    // ==================== HR LOGIC CONTROL ====================
+    function switchHRTab(tabName, btn) {
+      document.querySelectorAll('.hr-tab-btn').forEach(b => {
         b.classList.remove('bg-amber-500', 'text-slate-950', 'font-bold');
-
         b.classList.add('text-slate-400', 'hover:bg-slate-800', 'hover:text-white');
-
       });
-
       btn.classList.add('bg-amber-500', 'text-slate-950', 'font-bold');
-
-      currentTab = tabName;
-
-      document.getElementById('search-input').value = '';
-
-
+      activeHRTab = tabName;
+      document.getElementById('hr-search-input').value = '';
+      document.getElementById('year-filter-container').classList.add('hidden');
 
       if (tabName === 'reports') {
-
-        document.getElementById('page-title').innerText = 'System Analytics Dashboard';
-
-        document.getElementById('table-container').classList.add('hidden');
-
-        document.getElementById('add-btn').classList.add('hidden');
-
-        document.getElementById('search-container').classList.add('hidden');
-
-        document.getElementById('dashboard-view').classList.remove('hidden');
-
-        renderReportSection('summary');
-
+        document.getElementById('hr-page-title').innerText = 'System Analytics Dashboard';
+        document.getElementById('hr-table-container').classList.add('hidden');
+        document.getElementById('hr-add-btn').classList.add('hidden');
+        document.getElementById('hr-search-container').classList.add('hidden');
+        document.getElementById('hr-dashboard-view').classList.remove('hidden');
+        renderHRReport('summary', document.querySelector('.hr-report-tab'));
       } else {
-
-        document.getElementById('page-title').innerText = tabName.toUpperCase() + ' Management Log';
-
-        document.getElementById('dashboard-view').classList.add('hidden');
-
-        document.getElementById('table-container').classList.remove('hidden');
-
-        document.getElementById('add-btn').classList.remove('hidden');
-
-        document.getElementById('search-container').classList.remove('hidden');
-
-        renderTable(tabName, localDatabaseCache[tabName]);
-
+        document.getElementById('hr-page-title').innerText = tabName.toUpperCase() + ' Engine Records';
+        document.getElementById('hr-dashboard-view').classList.add('hidden');
+        document.getElementById('hr-table-container').classList.remove('hidden');
+        document.getElementById('hr-add-btn').classList.remove('hidden');
+        document.getElementById('hr-search-container').classList.remove('hidden');
+        
+        if (tabName === 'requests') {
+          document.getElementById('year-filter-container').classList.remove('hidden');
+          filterRequestsByYear();
+        } else {
+          renderHRTable(tabName, localDatabaseCache[tabName]);
+        }
       }
-
     }
 
-
-
-    function filterCurrentTable() {
-
-      const query = document.getElementById('search-input').value.toLowerCase();
-
-      const rows = document.querySelectorAll('#table-body tr');
-
+    function filterHRTable() {
+      const query = document.getElementById('hr-search-input').value.toLowerCase();
+      const rows = document.querySelectorAll('#hr-table-body tr');
       rows.forEach(row => { row.style.display = row.textContent.toLowerCase().includes(query) ? "" : "none"; });
-
     }
 
+    // فلترة الطلبات بالسنة المضافة لتسريع التصفح
+    function filterRequestsByYear() {
+      let selectedYear = document.getElementById('year-select-box').value;
+      let allRequests = localDatabaseCache.requests || {};
+      let filtered = {};
+      for (let k in allRequests) {
+        let ts = allRequests[k].timestamp || '';
+        if (ts.startsWith(selectedYear)) {
+          filtered[k] = allRequests[k];
+        }
+      }
+      renderHRTable('requests', filtered);
+    }
 
-
-    function renderTable(node, data) {
-
-      const thead = document.getElementById('table-head');
-
-      const tbody = document.getElementById('table-body');
-
+    function renderHRTable(node, data) {
+      const thead = document.getElementById('hr-table-head');
+      const tbody = document.getElementById('hr-table-body');
       thead.innerHTML = ''; tbody.innerHTML = '';
-
       let itemsArray = Object.keys(data).map(key => { return { id: key, ...data[key] }; });
 
-
-
       if (node === 'employees') {
-
         itemsArray.sort((a, b) => (parseInt(String(a.employeeNo).replace(/[^0-9]/g, '')) || 0) - (parseInt(String(b.employeeNo).replace(/[^0-9]/g, '')) || 0));
-
-        thead.innerHTML = `<tr>${['Emp No', 'Full Name', 'ID / Iqama', 'Job Title', 'Total Salary', 'Iqama Expire', 'Nationality', 'Phone', 'Actions'].map(h => `<th class="p-4">${h}</th>`).join('')}</tr>`;
-
+        thead.innerHTML = `<tr>${['Emp No', 'Full Name', 'ID / Iqama', 'Job Title', 'Total Salary', 'Nationality', 'Phone', 'Password', 'Actions'].map(h => `<th class="p-4">${h}</th>`).join('')}</tr>`;
         itemsArray.forEach(emp => {
-
-          tbody.innerHTML += `<tr class="hover:bg-slate-50"><td class="p-4 font-bold text-slate-900">${emp.employeeNo}</td><td class="p-4 font-medium">${emp.fullName || '-'}</td><td class="p-4 font-mono">${emp.nationalId || '-'}</td><td class="p-4"><span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-xs border border-blue-100">${emp.jobTitle || '-'}</span></td><td class="p-4 text-emerald-600 font-bold">${emp.totalSalary} SAR</td><td class="p-4 text-amber-800">${emp.iqamaExpDate || '-'}</td><td class="p-4">${emp.nationality || '-'}</td><td class="p-4 text-xs font-mono">${emp.phoneNumber || '-'}</td><td class="p-4"><button onclick="openEditModal('${emp.id}')" class="text-blue-600 hover:text-blue-900"><i class="fa-solid fa-marker"></i></button></td></tr>`;
-
+          tbody.innerHTML += `<tr class="hover:bg-slate-50"><td class="p-4 font-bold text-slate-900">${emp.employeeNo}</td><td class="p-4 font-medium">${emp.fullName || '-'}</td><td class="p-4 font-mono">${emp.nationalId || '-'}</td><td class="p-4"><span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-xs border border-blue-100">${emp.jobTitle || '-'}</span></td><td class="p-4 text-emerald-600 font-bold">${emp.totalSalary} SAR</td><td class="p-4">${emp.nationality || '-'}</td><td class="p-4 text-xs font-mono">${emp.phoneNumber || '-'}</td><td class="p-4 font-mono text-slate-400">${emp.portalPassword || '123'}</td><td class="p-4"><button onclick="openHREditModal('${emp.id}')" class="text-blue-600 hover:text-blue-900"><i class="fa-solid fa-marker"></i></button></td></tr>`;
         });
-
       }
-
-      else if (node === 'requests') {
-
-        thead.innerHTML = `<tr>${['Request ID', 'Timestamp', 'Email', 'Full Name', 'Type', 'Status', 'Actions'].map(h => `<th class="p-4">${h}</th>`).join('')}</tr>`;
-
-        itemsArray.forEach(req => {
-
-          tbody.innerHTML += `
-
-            <tr class="hover:bg-slate-50">
-
-              <td class="p-4 font-mono text-xs text-slate-400">${req.id}</td>
-
-              <td class="p-4 text-xs">${req.timestamp || '-'}</td>
-
-              <td class="p-4 text-xs font-mono">${req.email || '-'}</td>
-
-              <td class="p-4 font-medium">${req.fullName || '-'}</td>
-
-              <td class="p-4 font-semibold text-indigo-600">${req.requestType || '-'}</td>
-
-              <td class="p-4"><span class="px-2 py-0.5 rounded text-xs font-bold ${req.status === 'Solved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${req.status || 'Pending'}</span></td>
-
-              <td class="p-4 flex space-x-3">
-
-                <button onclick="openEditModal('${req.id}')" class="text-blue-600"><i class="fa-solid fa-pen"></i></button>
-
-                <button onclick="deleteRequestSecured('${req.id}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash-can"></i></button>
-
-              </td>
-
-            </tr>`;
-
-        });
-
-      }
-
-      else {
-
-        if (itemsArray.length === 0) { tbody.innerHTML = `<tr><td class="p-4 text-gray-400">Node log database is empty.</td></tr>`; return; }
-
-        let fields = Object.keys(itemsArray[0]).filter(f => f !== 'id');
-
-        thead.innerHTML = `<tr>${fields.map(f => `<th class="p-4 uppercase text-xs tracking-wider">${f}</th>`).join('')}<th class="p-4">Actions</th></tr>`;
-
+      else if (node === 'laborRecords') {
+        thead.innerHTML = `<tr>${['Date', 'Employee Name', 'Record Type', 'Action', 'Amount', 'Notes', 'Actions'].map(h => `<th class="p-4">${h}</th>`).join('')}</tr>`;
         itemsArray.forEach(item => {
-
-          let rowHtml = fields.map(f => `<td class="p-4">${item[f] || '-'}</td>`).join('');
-
-          tbody.innerHTML += `<tr class="hover:bg-slate-50">${rowHtml}<td class="p-4"><button onclick="openEditModal('${item.id}')" class="text-blue-600"><i class="fa-solid fa-pen"></i></button></td></tr>`;
-
+          tbody.innerHTML += `<tr class="hover:bg-slate-50"><td class="p-4">${item.date || '-'}</td><td class="p-4 font-bold">${item.employeeName || '-'}</td><td class="p-4">${item.recordType || '-'}</td><td class="p-4"><span class="px-2 py-0.5 rounded text-xs ${item.actionTaken==='Deduction'?'bg-rose-100 text-rose-800':'bg-emerald-100 text-emerald-800'}">${item.actionTaken || '-'}</span></td><td class="p-4 font-bold text-slate-900">${item.amount} SAR</td><td class="p-4 text-xs">${item.notes || '-'}</td><td class="p-4"><button onclick="openHREditModal('${item.id}')" class="text-blue-600"><i class="fa-solid fa-pen"></i></button></td></tr>`;
         });
-
       }
-
+      else if (node === 'requests') {
+        thead.innerHTML = `<tr>${['Timestamp', 'Email', 'Full Name', 'Type', 'Status', 'Actions'].map(h => `<th class="p-4">${h}</th>`).join('')}</tr>`;
+        itemsArray.forEach(req => {
+          tbody.innerHTML += `
+            <tr class="hover:bg-slate-50">
+              <td class="p-4 text-xs font-mono">${req.timestamp || '-'}</td>
+              <td class="p-4 text-xs">${req.email || '-'}</td>
+              <td class="p-4 font-medium">${req.fullName || '-'}</td>
+              <td class="p-4 font-semibold text-indigo-600">${req.requestType || '-'}</td>
+              <td class="p-4"><span class="px-2 py-0.5 rounded text-xs font-bold ${req.status === 'Solved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${req.status || 'Pending'}</span></td>
+              <td class="p-4 flex space-x-3">
+                <button onclick="openHREditModal('${req.id}')" class="text-blue-600"><i class="fa-solid fa-pen"></i></button>
+                <button onclick="deleteHRRequest('${req.id}')" class="text-red-500"><i class="fa-solid fa-trash-can"></i></button>
+              </td>
+            </tr>`;
+        });
+      }
+      else if (node === 'attendance') {
+        thead.innerHTML = `<tr>${['Date', 'Emp No', 'Name', 'Check-In', 'Check-Out', 'Duty Hours', 'OT Hours', 'Status', 'GPS Location'].map(h => `<th class="p-4">${h}</th>`).join('')}</tr>`;
+        itemsArray.forEach(att => {
+          tbody.innerHTML += `<tr class="hover:bg-slate-50"><td class="p-4 font-mono">${att.date || '-'}</td><td class="p-4 font-bold">${att.employeeNo || '-'}</td><td class="p-4">${att.name || '-'}</td><td class="p-4 text-emerald-600 font-bold">${att.checkIn || '-'}</td><td class="p-4 text-rose-600 font-bold">${att.checkOut || '-'}</td><td class="p-4 font-mono font-bold text-slate-900">${att.hoursWorked || '0'} hrs</td><td class="p-4 text-amber-600 font-mono font-bold">${att.otHours || '0'} hrs</td><td class="p-4"><span class="text-xs bg-slate-100 px-2 py-0.5 rounded">${att.status || 'Present'}</span></td><td class="p-4 text-[10px] text-slate-400 font-mono max-w-[120px] overflow-hidden truncate">${att.locationGPS || 'N/A'}</td></tr>`;
+        });
+      }
     }
 
-
-
-    function deleteRequestSecured(key) {
-
-      if (!confirm("Confirm secure deletion of this request?")) return;
-
-      fetch(`${DB_URL}requests/${key}.json?auth=${DB_SECRET}`, { method: 'DELETE' })
-
-        .then(res => { if(res.ok) preloadDatabaseFromHub(); });
-
+    function deleteHRRequest(key) {
+      if (!confirm("Confirm deleting this request record?")) return;
+      fetch(`${DB_URL}requests/${key}.json?auth=${DB_SECRET}`, { method: 'DELETE' }).then(() => preloadDataFromFirebase());
     }
 
-
-
-    function renderReportSection(type) {
-
-      document.querySelectorAll('.report-tab').forEach(b => { b.classList.remove('bg-amber-500', 'text-slate-950', 'font-bold'); b.classList.add('text-gray-600'); });
-
-      event.target.classList.add('bg-amber-500', 'text-slate-950', 'font-bold');
-
-      const view = document.getElementById('report-content-view'); view.innerHTML = '';
-
+    // بناء كشوف الحساب والتقارير الإدارية
+    function renderHRReport(type, btn) {
+      document.querySelectorAll('.hr-report-tab').forEach(b => { b.className = "hr-report-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"; });
+      btn.className = "hr-report-tab px-4 py-2 rounded-lg text-sm font-bold bg-amber-500 text-slate-950";
+      const view = document.getElementById('hr-report-content-view'); view.innerHTML = '';
       let emps = Object.values(localDatabaseCache.employees);
 
-
-
       if (type === 'summary') {
-
-        view.innerHTML = `<div class="bg-white p-5 rounded-xl shadow border h-80"><canvas id="chartSalaries"></canvas></div><div class="bg-white p-5 rounded-xl shadow border h-80"><canvas id="chartLabor"></canvas></div><div class="bg-white p-5 rounded-xl shadow border h-80"><canvas id="chartRequests"></canvas></div>`;
-
-        triggerSummaryCharts();
-
-      } 
-
-      else if (type === 'iqama') {
-
-        view.className = "grid grid-cols-1 gap-4 w-full";
-
-        let today = new Date();
-
-        view.innerHTML = emps.map(e => {
-
-          let daysLeft = 'Not Specified';
-
-          if (e.iqamaExpDate) {
-
-            let diff = new Date(e.iqamaExpDate).getTime() - today.getTime();
-
-            daysLeft = Math.ceil(diff / (1000 * 3600 * 24)) + " Days Remaining";
-
-          }
-
-          return `<div class="bg-white p-4 rounded-xl border flex justify-between items-center shadow-sm"><div><h5 class="font-bold text-gray-800">${e.fullName}</h5><p class="text-xs text-gray-400">Emp No: ${e.employeeNo}</p></div><div class="text-right"><span class="text-sm font-bold text-amber-800 bg-amber-50 border border-amber-200 px-3 py-1 rounded-lg">${daysLeft}</span></div></div>`;
-
-        }).join('');
-
-      } 
-
-      else if (type === 'ages') {
-
-        view.className = "grid grid-cols-1 md:grid-cols-2 gap-6 w-full";
-
-        view.innerHTML = `<div class="bg-white p-5 rounded-xl shadow border h-80 w-full"><canvas id="chartAge"></canvas></div>`;
-
-        let ageGroups = { 'Under 30': 0, '30 - 45': 0, 'Above 45': 0 };
-
-        emps.forEach(e => {
-
-          if(e.birthDate) {
-
-            let calcAge = 2026 - new Date(e.birthDate).getFullYear();
-
-            if(calcAge < 30) ageGroups['Under 30']++;
-
-            else if(calcAge <= 45) ageGroups['30 - 45']++;
-
-            else ageGroups['Above 45']++;
-
-          }
-
-        });
-
-        new Chart(document.getElementById('chartAge'), { type: 'bar', data: { labels: Object.keys(ageGroups), datasets: [{ label: 'Headcount', data: Object.values(ageGroups), backgroundColor: '#6366f1' }] }, options: { responsive:true, maintainAspectRatio:false } });
-
-      } 
-
-      else if (type === 'nationalities') {
-
-        view.className = "grid grid-cols-1 md:grid-cols-2 gap-6 w-full";
-
-        view.innerHTML = `<div class="bg-white p-5 rounded-xl shadow border h-80 w-full"><canvas id="chartNation"></canvas></div>`;
-
-        let natMap = {}; emps.forEach(e => { if(e.nationality) natMap[e.nationality] = (natMap[e.nationality] || 0) + 1; });
-
-        let total = emps.length || 1;
-
-        let labelsWithPercent = Object.keys(natMap).map(k => `${k} (${((natMap[k]/total)*100).toFixed(1)}%)`);
-
-        new Chart(document.getElementById('chartNation'), { type: 'pie', data: { labels: labelsWithPercent, datasets: [{ data: Object.values(natMap), backgroundColor: ['#10b981','#f59e0b','#ef4444','#3b82f6'] }] }, options: { responsive:true, maintainAspectRatio:false } });
-
-      }
-
-      else if (type === 'vacations') {
-
-        view.className = "grid grid-cols-1 gap-4 w-full";
-
-        let today = new Date();
-
-        view.innerHTML = emps.map(e => {
-
-          let statusText = "No previous return logged";
-
-          if (e.lastVacationReturnDate) {
-
-            let returnDate = new Date(e.lastVacationReturnDate);
-
-            let nextVacationDate = new Date(returnDate.setFullYear(returnDate.getFullYear() + 2)); // حساب سنتين بدقة من تاريخ العودة
-
-            let diff = nextVacationDate.getTime() - today.getTime();
-
-            let days = Math.ceil(diff / (1000 * 3600 * 24));
-
-            statusText = days > 0 ? `Next vacation due in ${days} days` : `❌ Vacation Cycle Overdue!`;
-
-          }
-
-          return `<div class="bg-white p-4 rounded-xl border flex justify-between items-center"><div><h5 class="font-bold text-gray-800">${e.fullName}</h5><p class="text-xs text-gray-400">Last Return: ${e.lastVacationReturnDate || 'None'}</p></div><div><span class="text-xs font-bold px-3 py-1 rounded bg-slate-100 text-slate-700">${statusText}</span></div></div>`;
-
-        }).join('');
-
-      }
-
-      else if (type === 'salaries') {
-
-        view.className = "grid grid-cols-1 gap-6 w-full";
-
-        let natSalaryMap = {}; let totalPayroll = 0;
-
-        emps.forEach(e => {
-
-          let nat = e.nationality || 'Other'; let sal = parseFloat(e.totalSalary) || 0;
-
-          natSalaryMap[nat] = (natSalaryMap[nat] || 0) + sal; totalPayroll += sal;
-
-        });
-
-        let financeRows = Object.keys(natSalaryMap).map(n => `<div class="flex justify-between border-b py-2 text-sm"><span>${n} Nationality:</span><span class="font-bold">${natSalaryMap[n].toLocaleString()} SAR</span></div>`).join('');
-
-        view.innerHTML = `<div class="bg-white p-6 rounded-xl border shadow-sm"><h3 class="text-lg font-bold text-slate-900 border-b pb-3 mb-3">Payroll Distribution by Nationality</h3>${financeRows}<div class="flex justify-between text-lg font-bold text-emerald-600 mt-4 pt-2 border-t border-dashed"><span>Grand Total Payroll:</span><span>${totalPayroll.toLocaleString()} SAR</span></div></div>`;
-
-      }
-
-    }
-
-
-
-    function triggerSummaryCharts() {
-
-      let salaryMap = {}; Object.values(localDatabaseCache.employees).forEach(e => { salaryMap[e.jobTitle || 'Other'] = (salaryMap[e.jobTitle || 'Other'] || 0) + (parseFloat(e.totalSalary) || 0); });
-
-      let laborMap = { 'Absence': 0, 'Penalty/Other': 0 }; Object.values(localDatabaseCache.laborRecords).forEach(l => { laborMap[l.recordType === 'Absence' ? 'Absence' : 'Penalty/Other']++; });
-
-      let reqMap = { 'Pending': 0, 'Solved': 0 }; Object.values(localDatabaseCache.requests).forEach(r => { reqMap[r.status === 'Solved' ? 'Solved' : 'Pending']++; });
-
-      new Chart(document.getElementById('chartSalaries'), { type: 'bar', data: { labels: Object.keys(salaryMap), datasets: [{ label: 'Payroll (SAR)', data: Object.values(salaryMap), backgroundColor: '#10b981' }] }, options: { responsive:true, maintainAspectRatio:false } });
-
-      new Chart(document.getElementById('chartLabor'), { type: 'pie', data: { labels: Object.keys(laborMap), datasets: [{ data: Object.values(laborMap), backgroundColor: ['#ef4444','#f59e0b'] }] }, options: { responsive:true, maintainAspectRatio:false } });
-
-      new Chart(document.getElementById('chartRequests'), { type: 'doughnut', data: { labels: Object.keys(reqMap), datasets: [{ data: Object.values(reqMap), backgroundColor: ['#f59e0b','#6366f1'] }] }, options: { responsive:true, maintainAspectRatio:false } });
-
-    }
-
-
-
-    function openEditModal(key) {
-
-      document.getElementById('modal-title').innerText = 'Update Record';
-
-      document.getElementById('form-key').value = key;
-
-      generateFormFields(localDatabaseCache[currentTab][key]);
-
-      document.getElementById('crud-modal').classList.remove('hidden');
-
-    }
-
-
-
-    function openAddModal() {
-
-      document.getElementById('modal-title').innerText = 'Add New Entry';
-
-      document.getElementById('form-key').value = '';
-
-      generateFormFields(schemas[currentTab]);
-
-      document.getElementById('crud-modal').classList.remove('hidden');
-
-    }
-
-
-
-    function closeModal() { document.getElementById('crud-modal').classList.add('hidden'); }
-
-
-
-    // الـ Listboxes والمصفوفات الذكية لمنع الخطأ في الكتابة يدويًا
-
-    function generateFormFields(obj) {
-
-      const container = document.getElementById('form-fields'); container.innerHTML = '';
-
-      for (let field in obj) {
-
-        let labelText = field.replace(/([A-Z])/g, ' $1').toUpperCase();
-
+        view.className = "grid grid-cols-1 md:grid-cols-3 gap-6";
+        view.innerHTML = `<div class="bg-white p-5 rounded-xl shadow border h-80"><canvas id="hrChartSal"></canvas></div><div class="bg-white p-5 rounded-xl shadow border h-80"><canvas id="hrChartLabor"></canvas></div><div class="bg-white p-5 rounded-xl shadow border h-80"><canvas id="hrChartReq"></canvas></div>`;
         
-
-        // التحقق والتحويل التلقائي إلى Listbox بناءً على اسم الحقل
-
-        if (field === 'nationality' || field === 'jobTitle' || field === 'status' || field === 'requestType') {
-
-          let optionsList = listsOptions[field];
-
-          let optionsHtml = optionsList.map(opt => `<option value="${opt}" ${obj[field] === opt ? 'selected' : ''}>${opt}</option>`).join('');
-
-          container.innerHTML += `
-
-            <div>
-
-              <label class="block text-xs font-bold text-gray-500 uppercase mb-1">${labelText} (قائمة خيارات)</label>
-
-              <select name="${field}" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-amber-500/20 focus:outline-none">
-
+        let salaryMap = {}; emps.forEach(e => { salaryMap[e.jobTitle || 'Other'] = (salaryMap[e.jobTitle || 'Other'] || 0) + (parseFloat(e.totalSalary) || 0); });
+        let laborMap = { 'Absence': 0, 'Penalty/Other': 0 }; Object.values(localDatabaseCache.laborRecords).forEach(l => { laborMap[l.recordType === 'Absence' ? 'Absence' : 'Penalty/Other']++; });
+        let reqMap = { 'Pending': 0, 'Solved': 0 }; Object.values(localDatabaseCache.requests).forEach(r => { reqMap[r.status === 'Solved' ? 'Solved' : 'Pending']++; });
+        
+        new Chart(document.getElementById('hrChartSal'), { type: 'bar', data: { labels: Object.keys(salaryMap), datasets: [{ label: 'Payroll (SAR)', data: Object.values(salaryMap), backgroundColor: '#10b981' }] }, options: { responsive:true, maintainAspectRatio:false } });
+        new Chart(document.getElementById('hrChartLabor'), { type: 'pie', data: { labels: Object.keys(laborMap), datasets: [{ data: Object.values(laborMap), backgroundColor: ['#ef4444','#f59e0b'] }] }, options: { responsive:true, maintainAspectRatio:false } });
+        new Chart(document.getElementById('hrChartReq'), { type: 'doughnut', data: { labels: Object.keys(reqMap), datasets: [{ data: Object.values(reqMap), backgroundColor: ['#f59e0b','#6366f1'] }] }, options: { responsive:true, maintainAspectRatio:false } });
+      } 
+      else if (type === 'statement') {
+        // ميزة كشف الحساب المتطابقة مع الصورة بـ Running Total تلبية لطلبك
+        view.className = "grid grid-cols-1 gap-6 w-full col-span-3";
+        let optionsHtml = emps.map(e => `<option value="${e.fullName}">${e.fullName} (No: ${e.employeeNo})</option>`).join('');
+        
+        view.innerHTML = `
+          <div class="bg-white p-6 rounded-xl border shadow-sm space-y-4">
+            <div class="flex items-center space-x-4">
+              <label class="font-bold text-sm text-gray-700">اختر اسم الموظف لإصدار كشف الحساب:</label>
+              <select id="statement-selector" onchange="generateRunningStatementHR()" class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                <option value="">-- اختر موظف --</option>
                 ${optionsHtml}
-
               </select>
-
-            </div>`;
-
-        } else {
-
-          let inputType = "text";
-
-          if (field.toLowerCase().includes('date') || field === 'date' || field === 'timestamp') inputType = "date";
-
-          container.innerHTML += `<div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">${labelText}</label><input type="${inputType}" name="${field}" value="${obj[field] || ''}" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-slate-50 focus:bg-white focus:outline-none"></div>`;
-
-        }
-
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm border-collapse">
+                <thead>
+                  <tr class="bg-slate-900 text-white font-bold">
+                    <th class="p-3">Date (التاريخ)</th>
+                    <th class="p-3">Type (النوع)</th>
+                    <th class="p-3">Ded (المستقطع)</th>
+                    <th class="p-3">Balance (الرصيد المتبقي)</th>
+                    <th class="p-3">Notes (الملاحظات)</th>
+                  </tr>
+                </thead>
+                <tbody id="hr-statement-rows-container" class="divide-y font-mono">
+                  <tr><td colspan="5" class="p-4 text-center text-gray-400">يرجى تحديد موظف من القائمة لعرض كشف الحساب التراكمي.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>`;
       }
-
+      else if (type === 'iqama') {
+        view.className = "grid grid-cols-1 gap-3 w-full col-span-3";
+        let today = new Date();
+        view.innerHTML = emps.map(e => {
+          let daysLeft = 'Not Specified';
+          if (e.iqamaExpDate) {
+            let diff = new Date(e.iqamaExpDate).getTime() - today.getTime();
+            daysLeft = Math.ceil(diff / (1000 * 3600 * 24)) + " Days Remaining";
+          }
+          return `<div class="bg-white p-4 rounded-xl border flex justify-between items-center shadow-sm"><div><h5 class="font-bold text-gray-800">${e.fullName}</h5><p class="text-xs text-gray-400">Iqama: ${e.nationalId || '-'}</p></div><div><span class="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-3 py-1 rounded-lg">${daysLeft}</span></div></div>`;
+        }).join('');
+      }
+      else if (type === 'vacations') {
+        view.className = "grid grid-cols-1 gap-3 w-full col-span-3";
+        let today = new Date();
+        view.innerHTML = emps.map(e => {
+          let statusText = "No vacation logged";
+          if (e.lastVacationReturnDate) {
+            let returnDate = new Date(e.lastVacationReturnDate);
+            let nextVacationDate = new Date(returnDate.setFullYear(returnDate.getFullYear() + 2));
+            let diff = nextVacationDate.getTime() - today.getTime();
+            let days = Math.ceil(diff / (1000 * 3600 * 24));
+            statusText = days > 0 ? `Next cycle due in ${days} days` : `❌ Vacation Cycle Overdue!`;
+          }
+          return `<div class="bg-white p-4 rounded-xl border flex justify-between items-center"><div><h5 class="font-bold text-gray-800">${e.fullName}</h5><p class="text-xs text-gray-400">Last Return: ${e.lastVacationReturnDate || 'None'}</p></div><div><span class="text-xs font-bold px-3 py-1 rounded bg-slate-100 text-slate-700">${statusText}</span></div></div>`;
+        }).join('');
+      }
+      else if (type === 'salaries') {
+        view.className = "grid grid-cols-1 gap-6 w-full col-span-3";
+        let natSalaryMap = {}; let totalPayroll = 0;
+        emps.forEach(e => {
+          let nat = e.nationality || 'Other'; let sal = parseFloat(e.totalSalary) || 0;
+          natSalaryMap[nat] = (natSalaryMap[nat] || 0) + sal; totalPayroll += sal;
+        });
+        let rows = Object.keys(natSalaryMap).map(n => `<div class="flex justify-between border-b py-2 text-sm"><span>${n} Personnel:</span><span class="font-bold">${natSalaryMap[n].toLocaleString()} SAR</span></div>`).join('');
+        view.innerHTML = `<div class="bg-white p-6 rounded-xl border shadow-sm"><h3 class="text-lg font-bold text-slate-900 border-b pb-2 mb-2">Grand Payroll Structure</h3>${rows}<div class="flex justify-between text-lg font-bold text-emerald-600 mt-4 pt-2 border-t border-dashed"><span>Grand Total Monthly Cost:</span><span>${totalPayroll.toLocaleString()} SAR</span></div></div>`;
+      }
     }
 
+    function generateRunningStatementHR() {
+      let selectedEmp = document.getElementById('statement-selector').value;
+      let container = document.getElementById('hr-statement-rows-container');
+      if (!selectedEmp) { container.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">يرجى اختيار موظف.</td></tr>`; return; }
+      
+      let records = Object.values(localDatabaseCache.laborRecords).filter(l => l.employeeName === selectedEmp);
+      records.sort((a,b) => new Date(a.date) - new Date(b.date));
+      
+      let runningBalance = 0;
+      let rowsHtml = records.map(r => {
+        let amt = parseFloat(r.amount) || 0;
+        if (r.actionTaken === 'Deduction') runningBalance += amt;
+        else runningBalance -= amt;
+        
+        return `<tr><td class="p-3">${r.date}</td><td class="p-3 font-bold ${r.actionTaken==='Deduction'?'text-rose-600':'text-emerald-600'}">${r.actionTaken}</td><td class="p-3">${amt} SAR</td><td class="p-3 font-bold text-slate-900">${runningBalance} SAR</td><td class="p-3 text-xs text-gray-500">${r.notes || '-'}</td></tr>`;
+      }).join('');
+      
+      container.innerHTML = rowsHtml || `<tr><td colspan="5" class="p-4 text-center text-gray-400">لا توجد حركات مالية مسجلة لهذا الموظف.</td></tr>`;
+    }
 
+    function openHRAddModal() {
+      document.getElementById('hr-modal-title').innerText = 'Add New Entry';
+      document.getElementById('hr-form-key').value = '';
+      generateHRFormFields(schemas[activeHRTab]);
+      document.getElementById('hr-crud-modal').classList.remove('hidden');
+    }
 
-    function saveRecord(e) {
+    function openHREditModal(key) {
+      document.getElementById('hr-modal-title').innerText = 'Update Entry';
+      document.getElementById('hr-form-key').value = key;
+      generateHRFormFields(localDatabaseCache[activeHRTab][key]);
+      document.getElementById('hr-crud-modal').classList.remove('hidden');
+    }
 
+    function closeHRModal() { document.getElementById('hr-crud-modal').classList.add('hidden'); }
+
+    function generateHRFormFields(obj) {
+      const container = document.getElementById('hr-form-fields'); container.innerHTML = '';
+      for (let field in obj) {
+        let labelText = field.replace(/([A-Z])/g, ' $1').toUpperCase();
+        
+        if (field === 'nationality' || field === 'jobTitle' || field === 'status' || field === 'requestType') {
+          let options = listsOptions[field];
+          let optionsHtml = options.map(opt => `<option value="${opt}" ${obj[field] === opt ? 'selected' : ''}>${opt}</option>`).join('');
+          container.innerHTML += `<div><label class="block text-xs font-bold text-gray-500 mb-1">${labelText} (قائمة خيارات)</label><select name="${field}" class="w-full border rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-amber-500/20 focus:outline-none">${optionsHtml}</select></div>`;
+        } else {
+          let inputType = "text";
+          if (field.toLowerCase().includes('date') || field === 'date' || field === 'timestamp') inputType = "date";
+          container.innerHTML += `<div><label class="block text-xs font-bold text-gray-500 mb-1">${labelText}</label><input type="${inputType}" name="${field}" value="${obj[field] || ''}" class="w-full border rounded-lg px-3 py-2 text-sm bg-slate-50 focus:bg-white focus:outline-none"></div>`;
+        }
+      }
+    }
+
+    function saveHRRecord(e) {
       e.preventDefault();
-
-      const saveBtn = document.getElementById('save-btn'); saveBtn.innerText = "Securing Payload..."; saveBtn.disabled = true;
-
-      const key = document.getElementById('form-key').value;
-
-      const formData = new FormData(document.getElementById('modal-form'));
-
+      const btn = document.getElementById('hr-save-btn'); btn.innerText = "Securing Cloud Matrix..."; btn.disabled = true;
+      const key = document.getElementById('hr-form-key').value;
+      const formData = new FormData(document.getElementById('hr-modal-form'));
       let record = {}; formData.forEach((value, name) => { record[name] = value; });
+      const targetKey = key || (activeHRTab === 'employees' ? record['employeeNo'] : 'id_' + Date.now());
 
-      const targetKey = key || (currentTab === 'employees' ? record['employeeNo'] : 'id_' + Date.now());
-
-
-
-      fetch(`${DB_URL}${currentTab}/${targetKey}.json?auth=${DB_SECRET}`, {
-
+      fetch(`${DB_URL}${activeHRTab}/${targetKey}.json?auth=${DB_SECRET}`, {
         method: 'PUT',
-
         body: JSON.stringify(record)
-
-      }).then(res => {
-
-        saveBtn.innerText = "Save Record"; saveBtn.disabled = false;
-
-        if(res.ok) { closeModal(); preloadDatabaseFromHub(); }
-
+      }).then(() => {
+        btn.innerText = "Save Record"; btn.disabled = false;
+        closeHRModal(); preloadDataFromFirebase();
       });
-
     }
 
+
+    // ==================== 2. INDEPENDENT EMPLOYEE SELF-SERVICE WORKSPACE ====================
+    function processEmployeeAuth() {
+      let iqamaInput = document.getElementById('emp-login-iqama').value.trim();
+      let passwordInput = document.getElementById('emp-login-pass').value.trim();
+      
+      let emps = Object.values(localDatabaseCache.employees);
+      let matched = emps.find(e => e.nationalId === iqamaInput && (e.portalPassword || '123') === passwordInput);
+      
+      if (matched) {
+        currentSessionEmployee = matched;
+        document.getElementById('emp-login-pane').classList.add('hidden');
+        document.getElementById('emp-workspace-pane').classList.remove('hidden');
+        document.getElementById('emp-profile-name').innerText = matched.fullName;
+        document.getElementById('emp-profile-id').innerText = `Emp No: ${matched.employeeNo} | Iqama: ${matched.nationalId}`;
+        document.getElementById('emp-avatar-badge').innerText = matched.fullName.charAt(0);
+        
+        syncEmployeeWorkspaceData();
+      } else {
+        alert("Authentication Failed. Invalid Identity credentials.");
+      }
+    }
+
+    function syncEmployeeWorkspaceData() {
+      if(!currentSessionEmployee) return;
+      
+      // 1. بناء كشف الحساب الشخصي التراكمي للموظف بدقة
+      let myStatements = Object.values(localDatabaseCache.laborRecords).filter(l => l.employeeName === currentSessionEmployee.fullName);
+      myStatements.sort((a,b) => new Date(a.date) - new Date(b.date));
+      
+      let balance = 0;
+      let statementBody = document.getElementById('emp-statement-rows');
+      statementBody.innerHTML = '';
+      
+      myStatements.forEach(r => {
+        let amt = parseFloat(r.amount) || 0;
+        if (r.actionTaken === 'Deduction') balance += amt; else balance -= amt;
+        statementBody.innerHTML += `<tr><td class="p-3">${r.date}</td><td class="p-3 font-bold ${r.actionTaken==='Deduction'?'text-rose-400':'text-emerald-400'}">${r.actionTaken}</td><td class="p-3">${amt} SAR</td><td class="p-3 font-bold text-white">${balance} SAR</td><td class="p-3 text-slate-400">${r.notes || '-'}</td></tr>`;
+      });
+      if(myStatements.length === 0) { statementBody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-500">لا توجد حركات مالية مسجلة لك حالياً.</td></tr>`; }
+
+      // 2. بناء الأجندة الملونة الذكية (Calendar بالشهر الحالي) تلبية لطلبك
+      let calendarGrid = document.getElementById('emp-calendar-grid');
+      calendarGrid.innerHTML = '';
+      let today = new Date();
+      let currentMonth = today.getMonth();
+      let currentYear = today.getFullYear();
+      
+      let totalDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      let myAttendanceLogs = Object.values(localDatabaseCache.attendance).filter(a => a.employeeNo === currentSessionEmployee.employeeNo);
+
+      for (let day = 1; day <= totalDaysInMonth; day++) {
+        let dateString = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        let weekday = new Date(currentYear, currentMonth, day).getDay(); // 5 تعني يوم الجمعة
+        
+        let colorClass = "bg-rose-500 text-white font-bold"; // غائب بشكل افتراضي
+        let matchedLog = myAttendanceLogs.find(a => a.date === dateString);
+        
+        if (matchedLog && matchedLog.checkIn) {
+          colorClass = "bg-emerald-500 text-slate-950 font-bold"; // حاضر (أخضر)
+        } else if (weekday === 5) {
+          colorClass = "bg-amber-400 text-slate-950 font-bold"; // يوم جمعة (أصفر)
+        }
+        
+        calendarGrid.innerHTML += `<div class="${colorClass} p-2 rounded-lg text-center text-xs shadow-sm flex flex-col justify-between h-10"><span>${day}</span></div>`;
+      }
+    }
+
+    // هندسة تسجيل الحضور والإنصراف والأوفرتايم بالـ GPS وحساب الساعات تلقائياً وإرسال الإيميلات الفورية
+    function executeClockAction(actionType) {
+      if (!navigator.geolocation) { alert("GPS Geolocation service is blocked or unsupported."); return; }
+      
+      let todayStr = new Date().toISOString().split('T')[0];
+      let timeStr = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+      let attendanceKey = `${currentSessionEmployee.employeeNo}_${todayStr}`;
+      
+      navigator.geolocation.getCurrentPosition((pos) => {
+        let gpsCoordinates = `Lat: ${pos.coords.latitude.toFixed(5)}, Lng: ${pos.coords.longitude.toFixed(5)}`;
+        let targetNodeUrl = `${DB_URL}attendance/${attendanceKey}.json?auth=${DB_SECRET}`;
+        
+        // جلب السجل الحالي لهذا اليوم إن وجد لعدم مسح البيانات الأخرى
+        fetch(targetNodeUrl).then(res => res.json()).then(currentLog => {
+          let updatedPayload = currentLog || {
+            date: todayStr,
+            employeeNo: currentSessionEmployee.employeeNo,
+            name: currentSessionEmployee.fullName,
+            checkIn: '', checkOut: '', hoursWorked: '0',
+            otStart: '', otEnd: '', otHours: '0',
+            status: 'Present', locationGPS: gpsCoordinates
+          };
+          
+          updatedPayload.locationGPS = gpsCoordinates; // تحديث الموقع مع كل حركة لضمان الموثوقية
+          
+          if (actionType === 'checkin') {
+            updatedPayload.checkIn = timeStr;
+            document.getElementById('standard-live-status').innerText = `Checked In at ${timeStr}`;
+            document.getElementById('standard-calc-msg').innerText = `Shift initiated. Site localized.`;
+          }
+          else if (actionType === 'checkout') {
+            if(!updatedPayload.checkIn) { alert("Error: You must execute standard Check-In first."); return; }
+            updatedPayload.checkOut = timeStr;
+            
+            // حساب فوري ودقيق لعدد ساعات الدوام الفعلي
+            let diffHrs = (new Date(`${todayStr}T${timeStr}`) - new Date(`${todayStr}T${updatedPayload.checkIn}`)) / (1000 * 60 * 60);
+            updatedPayload.hoursWorked = diffHrs.toFixed(2);
+            document.getElementById('standard-live-status').innerText = `Shift Closed`;
+            document.getElementById('standard-calc-msg').innerText = `Total Duration: ${updatedPayload.hoursWorked} working hours.`;
+          }
+          else if (actionType === 'ot_start') {
+            updatedPayload.otStart = timeStr;
+            document.getElementById('ot-live-status').innerText = `OT Active from ${timeStr}`;
+            document.getElementById('ot-calc-msg').innerText = `Overtime tracking cycle initialized.`;
+          }
+          else if (actionType === 'ot_end') {
+            if(!updatedPayload.otStart) { alert("Error: Overtime cycle was not initiated."); return; }
+            updatedPayload.otEnd = timeStr;
+            
+            // حساب فوري ودقيق لعدد ساعات الأوفرتايم
+            let diffOt = (new Date(`${todayStr}T${timeStr}`) - new Date(`${todayStr}T${updatedPayload.otStart}`)) / (1000 * 60 * 60);
+            updatedPayload.otHours = diffOt.toFixed(2);
+            document.getElementById('ot-live-status').innerText = `OT Concluded`;
+            document.getElementById('ot-calc-msg').innerText = `Total Overtime: ${updatedPayload.otHours} hours secured.`;
+          }
+          
+          // حفظ الحركة السحابية الفورية في قاعدة البيانات
+          fetch(targetNodeUrl, { method: 'PUT', body: JSON.stringify(updatedPayload) }).then(() => {
+            alert(`Secured! ${actionType.toUpperCase()} action transmitted to Firebase Server successfully.`);
+            
+            // إطلاق إيميل فوري فوري للـ HR وللموظف عبر سيرفر جوجل
+            dispatchCloudNotificationEmail(updatedPayload, actionType);
+            
+            preloadDataFromFirebase();
+            setTimeout(() => { syncEmployeeWorkspaceData(); }, 1500);
+          });
+        });
+      }, () => {
+        alert("GPS Localization Failed. Secure verification requires device site authorization.");
+      });
+    }
+
+    // إرسال الإيميلات الفورية عند تسجيل الحضور والإنصراف والأوفرتايم تلقائياً
+    function dispatchCloudNotificationEmail(log, type) {
+      let emailPayload = {
+        action: "sendAttendanceAlert",
+        employeeName: log.name,
+        employeeNo: log.employeeNo,
+        actionType: type,
+        timestamp: `${log.date} @ ${new Date().toLocaleTimeString()}`,
+        gps: log.locationGPS,
+        hoursWorked: log.hoursWorked,
+        otHours: log.otHours
+      };
+      
+      // إرسال البيانات فوراً لسيرفر جوجل Apps Script ليتولى معالجة وإرسال الإيميلات دون تأخير للواجهة
+      fetch(GAS_REST_API, { method: 'POST', mode: 'no-cors', body: JSON.stringify(emailPayload) })
+        .catch(err => console.log("Email pipeline synced async."));
+    }
+
+    function logoutEmployee() {
+      currentSessionEmployee = null;
+      document.getElementById('emp-workspace-pane').classList.add('hidden');
+      document.getElementById('emp-login-pane').classList.remove('hidden');
+      document.getElementById('emp-login-iqama').value = '';
+      document.getElementById('emp-login-pass').value = '';
+    }
   </script>
-
 </body>
-
 </html>
